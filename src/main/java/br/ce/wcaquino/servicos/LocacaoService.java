@@ -3,6 +3,7 @@ package br.ce.wcaquino.servicos;
 import static br.ce.wcaquino.utils.DataUtils.adicionarDias;
 
 import java.util.Date;
+import java.util.List;
 
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
@@ -11,24 +12,41 @@ import br.ce.wcaquino.exceptions.FilmeSemEstoqueException;
 import br.ce.wcaquino.exceptions.LocadoraException;
 
 public class LocacaoService {
-	
-	public Locacao alugarFilme(Usuario usuario, Filme filme) throws LocadoraException, FilmeSemEstoqueException {
+
+	public Locacao alugarFilme(Usuario usuario, List<Filme> filmes) throws LocadoraException, FilmeSemEstoqueException {
 
 		if(usuario == null)
 			throw new LocadoraException("Usuario vazio!");
 
-		if(filme == null)
+		if(filmes == null || filmes.isEmpty())
 			throw new LocadoraException("Filme vazio!");
 
-		if (filme.getEstoque() == 0 )
-			throw new FilmeSemEstoqueException("Filme sem estoque!");
+		for (Filme filme: filmes) {
+			if(filme.getEstoque() == 0)
+				throw new FilmeSemEstoqueException("Filme sem estoque!");
+		}
+
+		if(filmes.size() >= 3)
+		    filmes.get(2).setPrecoLocacao(filmes.get(2).getPrecoLocacao()*0.75);
+
+        if(filmes.size() >= 4)
+            filmes.get(3).setPrecoLocacao(filmes.get(3).getPrecoLocacao()*0.50);
+
+        if(filmes.size() >= 5)
+            filmes.get(4).setPrecoLocacao(filmes.get(4).getPrecoLocacao()*0.25);
+
+        if(filmes.size() >= 6)
+            filmes.get(5).setPrecoLocacao(0.0);
+
 
 
 		Locacao locacao = new Locacao();
-		locacao.setFilme(filme);
+		locacao.setFilme(filmes);
 		locacao.setUsuario(usuario);
 		locacao.setDataLocacao(new Date());
-		locacao.setValor(filme.getPrecoLocacao());
+
+		calculaPrecoTotal(filmes);
+		locacao.setValor(calculaPrecoTotal(filmes));
 
 		//Entrega no dia seguinte
 		Date dataEntrega = new Date();
@@ -39,6 +57,15 @@ public class LocacaoService {
 		//TODO adicionar método para salvar
 		
 		return locacao;
+	}
+
+	private Double calculaPrecoTotal(List<Filme> filmes) {
+
+		Double precoTotal = 0.0;
+		for (Filme filme: filmes) {
+			precoTotal = precoTotal + filme.getPrecoLocacao();
+		}
+		return  precoTotal;
 	}
 
 }
