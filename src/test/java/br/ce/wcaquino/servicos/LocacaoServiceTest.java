@@ -6,6 +6,7 @@ import java.util.List;
 
 import br.ce.wcaquino.exceptions.FilmeSemEstoqueException;
 import br.ce.wcaquino.exceptions.LocadoraException;
+import br.ce.wcaquino.exceptions.NaoPodeAlugarFilmeDeDomingoException;
 import org.hamcrest.CoreMatchers;
 import org.junit.*;
 
@@ -75,7 +76,7 @@ public class LocacaoServiceTest {
 		filmes.add(filme3);
 
 		Locacao locacao = locacaoService.alugarFilme(usuario, filmes);
-		error.checkThat(locacao.getValor(), CoreMatchers.is(15.0));
+		error.checkThat(locacao.getValor(), CoreMatchers.is(13.75));
 		error.checkThat(DataUtils.isMesmaData(locacao.getDataLocacao(), new Date()), CoreMatchers.is(true));
 		error.checkThat(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1	)), CoreMatchers.is(true));
 
@@ -107,7 +108,7 @@ public class LocacaoServiceTest {
 
 		try {
 			Locacao locacao = locacaoService.alugarFilme(usuario, filmes);
-			error.checkThat(locacao.getValor(), CoreMatchers.is(15.0));
+			error.checkThat(locacao.getValor(), CoreMatchers.is(13.75));
 			error.checkThat(DataUtils.isMesmaData(locacao.getDataLocacao(), new Date()), CoreMatchers.is(true));
 			error.checkThat(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1	)), CoreMatchers.is(true));
 		}catch (Exception e){
@@ -176,7 +177,7 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void testLocadoraUsuaioFilmeVazio() throws FilmeSemEstoqueException{
+    public void testLocadoraUsuaioFilmeVazio() throws FilmeSemEstoqueException, NaoPodeAlugarFilmeDeDomingoException {
 
 		Filme filme = new Filme();
 		filme.setNome("Os Espiões");
@@ -203,7 +204,7 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void testLocadoraFilmeVazio() throws FilmeSemEstoqueException, LocadoraException {
+    public void testLocadoraFilmeVazio() throws FilmeSemEstoqueException, LocadoraException, NaoPodeAlugarFilmeDeDomingoException {
 
         exception.expect(LocadoraException.class);
         exception.expectMessage("Filme vazio!");
@@ -214,7 +215,7 @@ public class LocacaoServiceTest {
 
 
     @Test
-    public void teste_desconto_de_25_porcento_no_terceiro_filme() throws LocadoraException, FilmeSemEstoqueException {
+    public void teste_desconto_de_25_porcento_no_terceiro_filme() throws LocadoraException, FilmeSemEstoqueException, NaoPodeAlugarFilmeDeDomingoException {
 
         Filme filme = new Filme();
         filme.setNome("Os Espiões 1");
@@ -240,7 +241,7 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void teste_desconto_de_50_porcento_no_quarto_filme() throws LocadoraException, FilmeSemEstoqueException {
+    public void teste_desconto_de_50_porcento_no_quarto_filme() throws LocadoraException, FilmeSemEstoqueException, NaoPodeAlugarFilmeDeDomingoException {
 
         Filme filme = new Filme();
         filme.setNome("Os Espiões 1");
@@ -271,7 +272,7 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void teste_desconto_de_75_porcento_no_quinto_filme() throws LocadoraException, FilmeSemEstoqueException {
+    public void teste_desconto_de_75_porcento_no_quinto_filme() throws LocadoraException, FilmeSemEstoqueException, NaoPodeAlugarFilmeDeDomingoException {
 
         Filme filme = new Filme();
         filme.setNome("Os Espiões 1");
@@ -307,7 +308,7 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void teste_desconto_de_100_porcento_no_sexto_filme() throws LocadoraException, FilmeSemEstoqueException {
+    public void teste_desconto_de_100_porcento_no_sexto_filme() throws LocadoraException, FilmeSemEstoqueException, NaoPodeAlugarFilmeDeDomingoException {
 
         Filme filme = new Filme();
         filme.setNome("Os Espiões 1");
@@ -344,6 +345,22 @@ public class LocacaoServiceTest {
         Locacao locacao = locacaoService.alugarFilme(usuario,filmes);
 
         error.checkThat(locacao.getValor(), CoreMatchers.is(35.00));
+
+    }
+
+    @Test
+    public void Testa_se_eh_possivel_alugar_filme_de_domingo() throws FilmeSemEstoqueException, LocadoraException, NaoPodeAlugarFilmeDeDomingoException{
+        Filme filme = new Filme();
+        filme.setNome("Os Espiões 1");
+        filme.setEstoque(5);
+        filme.setPrecoLocacao(10.0);
+
+        filmes.add(filme);
+
+        //exception.expect(NaoPodeAlugarFilmeDeDomingoException.class);
+        //exception.expectMessage("Domingo nao pode alugar filme");
+
+        Locacao locacao = locacaoService.alugarFilme(usuario,filmes);
 
     }
 

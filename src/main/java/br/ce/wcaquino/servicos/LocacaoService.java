@@ -2,6 +2,7 @@ package br.ce.wcaquino.servicos;
 
 import static br.ce.wcaquino.utils.DataUtils.adicionarDias;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -10,10 +11,12 @@ import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
 import br.ce.wcaquino.exceptions.FilmeSemEstoqueException;
 import br.ce.wcaquino.exceptions.LocadoraException;
+import br.ce.wcaquino.exceptions.NaoPodeAlugarFilmeDeDomingoException;
+import br.ce.wcaquino.utils.DataUtils;
 
 public class LocacaoService {
 
-	public Locacao alugarFilme(Usuario usuario, List<Filme> filmes) throws LocadoraException, FilmeSemEstoqueException {
+	public Locacao alugarFilme(Usuario usuario, List<Filme> filmes) throws LocadoraException, FilmeSemEstoqueException, NaoPodeAlugarFilmeDeDomingoException {
 
 		if(usuario == null)
 			throw new LocadoraException("Usuario vazio!");
@@ -43,7 +46,7 @@ public class LocacaoService {
 		Locacao locacao = new Locacao();
 		locacao.setFilme(filmes);
 		locacao.setUsuario(usuario);
-		locacao.setDataLocacao(new Date());
+		locacao.setDataLocacao(verificaDiaAtual());
 
 		calculaPrecoTotal(filmes);
 		locacao.setValor(calculaPrecoTotal(filmes));
@@ -67,5 +70,12 @@ public class LocacaoService {
 		}
 		return  precoTotal;
 	}
+
+	private Date verificaDiaAtual() throws NaoPodeAlugarFilmeDeDomingoException{
+	    if(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY)){
+            throw new NaoPodeAlugarFilmeDeDomingoException("Domingo nao pode alugar filme");
+        }
+	    return new Date();
+    }
 
 }
