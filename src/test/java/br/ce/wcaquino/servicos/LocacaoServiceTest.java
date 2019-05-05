@@ -17,6 +17,8 @@ import br.ce.wcaquino.utils.DataUtils;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 
+import static br.ce.wcaquino.builders.UsuarioBuilder.*;
+
 public class LocacaoServiceTest {
 
 	private LocacaoService locacaoService;
@@ -34,9 +36,9 @@ public class LocacaoServiceTest {
 	@Before
 	public void setUp(){
 		locacaoService = new LocacaoService();
-        usuario = new Usuario();
+        usuario = umUsuario().nomeEh("Luiz Henrique").agora();
         filmes = new ArrayList<>();
-        usuario.setNome("Luiz");
+        //usuario.setNome("Luiz");
 		//System.out.println("Antes de cada Método");
 	}
 
